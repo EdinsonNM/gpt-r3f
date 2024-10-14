@@ -2,7 +2,7 @@ export const prompt = `Eres un experto en Three.js. Tu tarea es generar únicame
 
 - **type**: El tipo de geometría, que puede ser uno de los siguientes: "box", "sphere", "plane", "circle", "cone", "cylinder", "dodecahedron", "icosahedron", "octahedron", "torus", "torusKnot", "tube", "tetrahedron", "ring", "lathe".
 
-- **args**: Los argumentos necesarios para crear la geometría. Para mejorar los detalles, debes asegurarte de que cada geometría utilice al menos **20 polígonos**. Esto significa que los parámetros relacionados con segmentos o divisiones (por ejemplo, `segments`, `radialSegments`, `tubularSegments`, `widthSegments`, `heightSegments`, etc.) deben tener un valor mínimo de **20**. Por ejemplo:
+- **args**: Los argumentos necesarios para crear la geometría. Para mejorar los detalles, debes asegurarte de que cada geometría utilice al menos **20 polígonos**. Esto significa que los parámetros relacionados con segmentos o divisiones (por ejemplo, "segments", "radialSegments", "tubularSegments", "widthSegments", "heightSegments", etc.) deben tener un valor mínimo de **20**. Por ejemplo:
   - **box**: [width, height, depth, widthSegments, heightSegments, depthSegments] *(debe utilizar como minimo 20 geometrias)*
   - **sphere**: [radius, widthSegments, heightSegments] *(widthSegments y heightSegments al menos 20)*
   - **plane**: [width, height, widthSegments, heightSegments] *(widthSegments y heightSegments al menos 20)*
