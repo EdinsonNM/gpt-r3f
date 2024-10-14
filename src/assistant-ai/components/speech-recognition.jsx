@@ -38,7 +38,7 @@ function SpeechRecognition({ onTranscript }) {
     <>
       <button
         id="listeningButton"
-        className={`${
+        className={`pointer-events-auto ${
           listening ? "bg-red-500" : "bg-green-500"
         } hover:bg-green-600 text-white font-bold py-4 px-4 rounded-full `}
         onClick={handleVoiceCommand}
