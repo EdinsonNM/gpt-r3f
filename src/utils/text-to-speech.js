@@ -1,6 +1,30 @@
-export function generateSpeech(message) {
+export const voices = [
+  {name: "Edinson", voice_id: "UyNeF3M6NUtWcGxKDvG3"},
+  {name: "Alvia", voice_id: "g811CobCo5EJJTiktJOs"},
+  {name: "Sebas", voice_id: "YClRIXArhwtIuDj7bG7z"},
+]
+
+let currentAudioContext = null;
+let currentSource = null;
+
+export function generateSpeech(message, voiceId = voices[0].voice_id) {
+  console.log("generateSpeech called with voiceId:", voiceId);
+  console.log("Available voices:", voices.map(v => `${v.name}: ${v.voice_id}`).join(', '));
+  
+  // Asegurarnos de que el voiceId es válido
+  const validVoiceId = voices.some(v => v.voice_id === voiceId) 
+    ? voiceId 
+    : voices[0].voice_id;
+  
+  if (validVoiceId !== voiceId) {
+    console.warn(`Voice ID ${voiceId} not found, using default voice: ${validVoiceId}`);
+  }
+  
+  const apiUrl = `https://api.elevenlabs.io/v1/text-to-speech/${validVoiceId}`;
+  console.log("Calling Eleven Labs API with URL:", apiUrl);
+  
   return fetch(
-    "https://api.elevenlabs.io/v1/text-to-speech/vqoh9orw2tmOS3mY7D2p",
+    apiUrl,
     {
       method: "POST",
       headers: {
@@ -19,20 +43,63 @@ export function generateSpeech(message) {
         },
       }),
     }
-  ).then((response) => response.blob());
+  )
+  .then((response) => {
+    if (!response.ok) {
+      console.error("Error from Eleven Labs API:", response.status, response.statusText);
+      return response.text().then(text => {
+        console.error("Response body:", text);
+        throw new Error(`Eleven Labs API error: ${response.status} ${response.statusText}`);
+      });
+    }
+    return response.blob();
+  })
+  .then(blob => {
+    console.log("Successfully generated speech with voice ID:", validVoiceId);
+    return blob;
+  })
+  .catch(error => {
+    console.error("Error generating speech:", error);
+    throw error;
+  });
 }
 
 export async function generateAndPlaySpeech(blob) {
   try {
-    const audioContext = new AudioContext();
-    const arrayBuffer = await blob.arrayBuffer();
-    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    console.log("generateAndPlaySpeech called with blob size:", blob.size);
+    
+    // Detener cualquier audio que esté reproduciéndose
+    if (currentSource) {
+      console.log("Stopping current audio playback");
+      currentSource.stop();
+      currentSource.disconnect();
+    }
+    if (currentAudioContext) {
+      console.log("Closing current audio context");
+      await currentAudioContext.close();
+    }
 
-    const source = audioContext.createBufferSource();
-    source.buffer = audioBuffer;
-    source.connect(audioContext.destination);
-    source.start();
+    // Crear nuevo contexto y fuente
+    console.log("Creating new audio context");
+    currentAudioContext = new AudioContext();
+    const arrayBuffer = await blob.arrayBuffer();
+    const audioBuffer = await currentAudioContext.decodeAudioData(arrayBuffer);
+
+    console.log("Starting audio playback");
+    currentSource = currentAudioContext.createBufferSource();
+    currentSource.buffer = audioBuffer;
+    currentSource.connect(currentAudioContext.destination);
+    currentSource.start();
+
+    // Limpiar cuando termine
+    currentSource.onended = () => {
+      console.log("Audio playback ended");
+      currentSource.disconnect();
+      currentAudioContext.close();
+      currentSource = null;
+      currentAudioContext = null;
+    };
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error playing speech:", error);
   }
 }
