@@ -1,7 +1,9 @@
 export const voices = [
+  {name: "Daniela Eleven Labs", voice_id: "ajOR9IDAaubDK5qtLUqQ"},
   {name: "Edinson", voice_id: "UyNeF3M6NUtWcGxKDvG3"},
   {name: "Alvia", voice_id: "g811CobCo5EJJTiktJOs"},
   {name: "Sebas", voice_id: "YClRIXArhwtIuDj7bG7z"},
+  {name: "Luz", voice_id: "u4ThkQirbimXl9xY8rLA"},
 ]
 
 let currentAudioContext = null;
