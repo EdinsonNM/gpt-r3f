@@ -19,7 +19,7 @@ class OpenAi {
       this.conversation.push({ role: "user", content: promptUser });
     }
     const completion = await openAi.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4.1-2025-04-14",
       temperature: 0.2,
       messages: this.conversation,
       //max_tokens: 1000,

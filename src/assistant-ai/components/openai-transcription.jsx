@@ -120,8 +120,58 @@ function OpenAITranscription({ onTranscript }) {
     }
   };
 
+  const startConversation = () => {
+    if (!listening && !isProcessing) {
+      // Si ya tiene permiso del micrófono, activar escucha
+      if (streamRef.current) {
+        const recorder = mediaRecorderRef.current;
+        audioChunksRef.current = [];
+        if (recorder && recorder.state !== 'recording') {
+          recorder.start();
+          setListening(true);
+        }
+      } else {
+        // Reinicializar el audio si no hay permisos
+        initializeAudio();
+      }
+    }
+  };
+
+  const stopConversation = () => {
+    if (listening) {
+      const recorder = mediaRecorderRef.current;
+      if (recorder && recorder.state === 'recording') {
+        recorder.stop();
+        setListening(false);
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col items-center">
+      <div className="mb-4 flex items-center space-x-2">
+        <button
+          onClick={startConversation}
+          disabled={listening || isProcessing}
+          className={`px-4 py-2 rounded-lg text-white font-medium ${
+            listening || isProcessing
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 transition-colors"
+          }`}
+        >
+          Iniciar conversación
+        </button>
+        
+        {listening && (
+          <button
+            onClick={stopConversation}
+            className="px-4 py-2 rounded-lg text-white font-medium bg-red-500 hover:bg-red-600 transition-colors"
+          >
+            Detener
+          </button>
+        )}
+      </div>
+      
       <div className={`w-4 h-4 rounded-full ${listening ? 'bg-red-500 animate-pulse' : isProcessing ? 'bg-yellow-500' : 'bg-gray-400'}`} />
       {transcript && (
         <div className="mt-3 text-white bg-black bg-opacity-50 px-4 py-2 rounded-lg max-w-md text-center">
